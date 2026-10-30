@@ -1,0 +1,237 @@
+/* theme — global application stylesheet */
+
+
+/* --- app/base.qss --- */
+/* app/base — window & host */
+
+QMainWindow { background: {{wash}}; }
+#MainPanelHost { background: {{wash}}; }
+QWidget { color: {{text}}; font-size: 13px; }
+QLabel { color: {{text}}; background: transparent; }
+
+/* --- app/frame.qss --- */
+/* app/frame — window frame: menu, toolbar, status, tabs, dock */
+
+QMenuBar {
+  background: transparent;
+  color: {{text}};
+  border: none;
+  border-bottom: 1px solid {{glass-rim}};
+  padding: 2px 8px;
+  spacing: 2px;
+  min-height: 32px;
+}
+
+QToolBar {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid {{glass-rim}};
+  spacing: 2px;
+  padding: 2px 6px;
+  min-height: 32px;
+}
+QToolBar#AutovizToolBar {
+  spacing: 2px;
+  padding: 3px 8px;
+  min-height: 34px;
+}
+QToolButton {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 3px 6px;
+  color: {{text}};
+  font-weight: 500;
+  font-size: 12px;
+}
+QToolBar#AutovizToolBar QToolButton {
+  padding: 3px 6px;
+  margin: 0;
+  border-radius: 5px;
+  color: #475569;
+}
+QToolButton:hover {
+  background: rgba(148,163,184,0.14);
+  border-color: rgba(148,163,184,0.22);
+  color: #0F766E;
+}
+QToolButton:pressed {
+  background: rgba(148,163,184,0.22);
+}
+QToolButton:checked {
+  background: rgba(8,145,178,0.14);
+  color: #0E7490;
+  border-color: rgba(8,145,178,0.32);
+}
+QToolButton:checked:hover {
+  background: rgba(8,145,178,0.20);
+}
+QToolButton:disabled { color: {{disabled}}; }
+QToolButton#AutovizToolbarChromeButton,
+QToolButton#AutovizToolbarSidebarToggle {
+  padding: 4px;
+  min-width: 28px;
+  max-width: 28px;
+  min-height: 28px;
+  max-height: 28px;
+}
+
+QStatusBar {
+  background: {{glass-bar}};
+  color: {{muted}};
+  border-top: 1px solid {{glass-rim}};
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+/* No Q*::pseudo-element rules in the app stylesheet — Qt 6.2 QCss can SEGV
+ * in Selector::pseudoElement during QPushButton/dock paint under live data. */
+QTabWidget { background: transparent; border: none; }
+QTabBar { background: transparent; }
+QDockWidget { color: {{text}}; background: transparent; }
+
+/* --- app/widgets.qss --- */
+/* app/widgets — forms, buttons, progress */
+
+QGroupBox {
+  border: 1px solid {{glass-rim}};
+  border-radius: {{r-panel}}px;
+  margin-top: 12px;
+  padding: 14px 10px 10px 10px;
+  background: {{glass-deep}};
+  color: {{muted}};
+  font-weight: 700;
+}
+
+QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QTextEdit, QPlainTextEdit {
+  background: {{glass-fill}};
+  color: {{text}};
+  border: 1px solid {{border}};
+  border-radius: {{r-ctrl}}px;
+  padding: 5px 8px;
+  min-height: 24px;
+  selection-background-color: {{sel-bg}};
+  selection-color: {{sel-text}};
+}
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus,
+QTextEdit:focus, QPlainTextEdit:focus {
+  border: 1px solid {{accent-soft}};
+  background: rgba(255,255,255,0.92);
+}
+QComboBox QAbstractItemView {
+  background: rgba(255,255,255,0.96);
+  color: {{text}};
+  border: 1px solid {{glass-rim}};
+  border-radius: {{r-ctrl}}px;
+  selection-background-color: {{sel-bg}};
+  selection-color: {{sel-text}};
+}
+
+/* QPushButton chrome via palette + ProxyStyle — global QPushButton:* QSS
+ * has SEGV'd in QCss::Selector::pseudoElement on Qt 6.2 after Ogre ready. */
+QCheckBox, QRadioButton { spacing: 6px; color: {{text}}; }
+
+QProgressBar {
+  background: {{border-light}}; border: 1px solid {{border}};
+  border-radius: 8px; text-align: center; color: {{text}};
+}
+
+/* --- app/views.qss --- */
+/* app/views — trees, lists, tables, scrollbars */
+
+QTreeWidget, QTreeView, QListWidget, QListView, QTableWidget, QTableView {
+  background: {{glass-fill}};
+  alternate-background-color: {{alt}};
+  color: {{text}};
+  border: 1px solid {{glass-rim}};
+  border-radius: {{r-panel}}px;
+  outline: none;
+}
+/* No ::item / ::handle / ::section here — Qt 6.2 QCss::Selector can SEGV when
+ * docks/trees resize under live Autolink traffic. Item chrome uses palette +
+ * delegates; scrollbars use the Fusion defaults from ProxyStyle. */
+QListWidget, QListView, QTableWidget, QTableView {
+  outline: none;
+}
+QHeaderView {
+  background: {{glass-bar}};
+  color: {{muted}};
+  border: none;
+}
+QScrollBar:vertical { background: transparent; width: 10px; margin: 0; }
+QScrollBar:horizontal { background: transparent; height: 10px; margin: 0; }
+
+/* --- app/overlay.qss --- */
+/* app/overlay — splitter, dialog, scroll area, tooltip */
+
+/* Splitter chrome via QSplitter defaults — no ::handle QSS (Qt 6.2 QCss SEGV). */
+QSplitter { background: transparent; }
+
+QDialog { background: {{wash}}; }
+QDialogButtonBox { background: transparent; }
+QScrollArea { background: transparent; border: none; }
+QScrollArea > QWidget > QWidget { background: transparent; }
+
+QToolTip {
+  background: rgba(255,255,255,0.94); color: {{text}};
+  border: 1px solid {{glass-rim}};
+  padding: 4px 8px; border-radius: 8px;
+}
+
+/* --- app/panel_ids.qss --- */
+/* app/panel_ids — themed object-name selectors */
+
+#{{id-content}} {
+  background: {{glass-fill}};
+  color: {{text}};
+  border: 1px solid {{glass-rim}};
+  border-radius: {{r-panel}}px;
+}
+#{{id-toolbar}} {
+  background: {{glass-bar}};
+  border: none;
+  border-bottom: 1px solid {{glass-rim}};
+}
+#{{id-footer}} {
+  background: {{glass-bar}};
+  border: none;
+  border-top: 1px solid {{glass-rim}};
+}
+#{{id-dock-title}} {
+  background: transparent;
+  border: none;
+}
+#{{id-dock-title}} QLabel {
+  font-weight: 600; color: {{text}}; padding: 0 4px;
+}
+#{{id-title-tools}} QToolButton {
+  border: 1px solid transparent; padding: 2px; background: transparent;
+  border-radius: 8px;
+}
+#{{id-title-tools}} QToolButton:hover {
+  background: rgba(255,255,255,0.55); border-color: {{glass-rim}};
+}
+#{{id-title-tools}} QToolButton:checked {
+  background: rgba(125,211,252,0.28); color: {{accent}};
+  border-color: rgba(125,211,252,0.55);
+}
+#{{id-hint}} {
+  color: {{muted}}; font-size: 11px;
+}
+#{{id-section}} {
+  font-size: 13px; font-weight: 700; color: {{text}}; background: transparent;
+}
+#{{id-pi-title}} {
+  font-weight: 700; padding: 0; color: {{text}};
+  background: transparent;
+}
+QTreeWidget#{{id-tree}}, QTreeView#{{id-tree}} {
+  background: {{glass-fill}}; color: {{text}}; border: none;
+  alternate-background-color: {{alt}};
+}
+#{{id-segment}} {
+  background: {{glass-cool}}; border: 1px solid {{glass-rim}};
+  border-radius: {{r-ctrl}}px; padding: 2px;
+}
+#{{id-settings}} { border: none; background: transparent; }
+

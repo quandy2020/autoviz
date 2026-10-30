@@ -1,0 +1,28 @@
+Log file created at: 2026/09/08 14:11:55
+Running on machine: quandy
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I20260908 14:11:55.409751 266238 global_data.cpp:232] host ip: 10.253.164.127
+I20260908 14:11:55.409775 266238 global_data.cpp:246] config_path: /workspace/autonomy/src/autonomy/autolink/autolink/conf/autolink.pb.conf
+I20260908 14:11:55.410228 266282 processor.cpp:67] processor_tid: 266282
+I20260908 14:11:55.410266 266283 processor.cpp:67] processor_tid: 266283
+I20260908 14:11:55.410282 266284 processor.cpp:67] processor_tid: 266284
+I20260908 14:11:55.410319 266285 processor.cpp:67] processor_tid: 266285
+I20260908 14:11:55.410344 266286 processor.cpp:67] processor_tid: 266286
+I20260908 14:11:55.410377 266287 processor.cpp:67] processor_tid: 266287
+I20260908 14:11:55.410405 266288 processor.cpp:67] processor_tid: 266288
+I20260908 14:11:55.410430 266289 processor.cpp:67] processor_tid: 266289
+I20260908 14:11:55.410490 266290 processor.cpp:67] processor_tid: 266290
+I20260908 14:11:55.410499 266291 processor.cpp:67] processor_tid: 266291
+I20260908 14:11:55.410499 266292 processor.cpp:67] processor_tid: 266292
+I20260908 14:11:55.410535 266293 processor.cpp:67] processor_tid: 266293
+I20260908 14:11:55.410570 266294 processor.cpp:67] processor_tid: 266294
+I20260908 14:11:55.410598 266295 processor.cpp:67] processor_tid: 266295
+I20260908 14:11:55.410625 266296 processor.cpp:67] processor_tid: 266296
+I20260908 14:11:55.410629 266238 init.cpp:129] Register exit handle succ.
+I20260908 14:11:55.410652 266297 processor.cpp:67] processor_tid: 266297
+I20260908 14:11:55.410669 266238 topology_manager.cpp:137] TopologyManager using backend=local host_ip=10.253.164.127
+I20260908 14:11:55.411032 266238 scheduler.cpp:54] create croutine: /tmp/dump_fathom_cpp_/camera/color/image_raw
+I20260908 14:11:55.411136 266238 scheduler.cpp:54] create croutine: /tmp/dump_fathom_cpp_/perception/fathom/refined_depth
+I20260908 14:11:55.411158 266298 shm_receiver.hpp:127] SHM receiver enabled for channel [/camera/color/image_raw] from writer (discovery ok)
+I20260908 14:11:55.411314 266298 shm_receiver.hpp:127] SHM receiver enabled for channel [/perception/fathom/refined_depth] from writer (discovery ok)
+I20260908 14:11:55.413479 266298 shm_receiver.hpp:127] SHM receiver enabled for channel [/perception/fathom/refined_depth] from writer (discovery ok)

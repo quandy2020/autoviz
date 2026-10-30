@@ -1,0 +1,29 @@
+Log file created at: 2026/09/08 11:24:52
+Running on machine: quandy
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I20260908 11:24:52.719412 252005 global_data.cpp:232] host ip: 10.253.164.127
+I20260908 11:24:52.719444 252005 global_data.cpp:246] config_path: /workspace/autonomy/src/autonomy/autolink/autolink/conf/autolink.pb.conf
+I20260908 11:24:52.721590 252049 processor.cpp:67] processor_tid: 252049
+I20260908 11:24:52.724601 252050 processor.cpp:67] processor_tid: 252050
+I20260908 11:24:52.727588 252051 processor.cpp:67] processor_tid: 252051
+I20260908 11:24:52.728596 252052 processor.cpp:67] processor_tid: 252052
+I20260908 11:24:52.728642 252053 processor.cpp:67] processor_tid: 252053
+I20260908 11:24:52.728665 252054 processor.cpp:67] processor_tid: 252054
+I20260908 11:24:52.728698 252055 processor.cpp:67] processor_tid: 252055
+I20260908 11:24:52.728785 252056 processor.cpp:67] processor_tid: 252056
+I20260908 11:24:52.728783 252057 processor.cpp:67] processor_tid: 252057
+I20260908 11:24:52.729570 252058 processor.cpp:67] processor_tid: 252058
+I20260908 11:24:52.729586 252059 processor.cpp:67] processor_tid: 252059
+I20260908 11:24:52.729619 252060 processor.cpp:67] processor_tid: 252060
+I20260908 11:24:52.729650 252061 processor.cpp:67] processor_tid: 252061
+I20260908 11:24:52.729717 252062 processor.cpp:67] processor_tid: 252062
+I20260908 11:24:52.729753 252063 processor.cpp:67] processor_tid: 252063
+I20260908 11:24:52.729763 252005 init.cpp:129] Register exit handle succ.
+I20260908 11:24:52.729771 252064 processor.cpp:67] processor_tid: 252064
+I20260908 11:24:52.729835 252005 topology_manager.cpp:137] TopologyManager using backend=local host_ip=10.253.164.127
+I20260908 11:24:52.730224 252005 scheduler.cpp:54] create croutine: /lingbot/dump_example8_/camera/color/image_raw
+I20260908 11:24:52.730404 252005 scheduler.cpp:54] create croutine: /lingbot/dump_example8_/camera/aligned_depth_to_color/image_raw
+I20260908 11:24:52.730549 252005 scheduler.cpp:54] create croutine: /lingbot/dump_example8_/camera/colorcamera_info
+I20260908 11:24:52.731212 252065 shm_receiver.hpp:127] SHM receiver enabled for channel [/camera/color/image_raw] from writer (discovery ok)
+I20260908 11:24:52.731266 252065 shm_receiver.hpp:127] SHM receiver enabled for channel [/camera/colorcamera_info] from writer (discovery ok)
+I20260908 11:24:52.731335 252065 shm_receiver.hpp:127] SHM receiver enabled for channel [/camera/aligned_depth_to_color/image_raw] from writer (discovery ok)

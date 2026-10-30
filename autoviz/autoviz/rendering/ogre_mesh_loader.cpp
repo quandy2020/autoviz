@@ -1,0 +1,183 @@
+/******************************************************************************
+ * Copyright 2026 The Openbot Authors (duyongquan)
+ *****************************************************************************/
+
+#include "autoviz/rendering/ogre_mesh_loader.hpp"
+
+#include <functional>
+#include <unordered_map>
+
+#include <QFileInfo>
+#include <QString>
+
+#include <OgreMeshManager.h>
+#include <OgreMeshSerializer.h>
+
+#include <glog/logging.h>
+
+#include "autoviz/plugins/displays/common/obj_mesh.hpp"
+#include "autoviz/plugins/displays/common/primitive_mesh.hpp"
+#ifdef AUTOVIZ_USE_ASSIMP
+#include "autoviz/rendering/mesh_loader_helpers/assimp_loader.hpp"
+#endif
+#include "autoviz/rendering/mesh_resource.hpp"
+#include "autoviz/rendering/ogre_procedural_shape.hpp"
+
+namespace autoviz {
+namespace rendering {
+namespace {
+
+constexpr char kMeshGroup[] = "aviz_rendering";
+
+std::size_t HashMesh(const display::ObjMesh& mesh) {
+  // Sample endpoints only — full scans of 100k+ tris every frame stall RobotModel.
+  std::size_t hash = mesh.vertices.size();
+  hash ^= mesh.triangles.size() + 0x9e3779b9;
+  if (!mesh.vertices.empty()) {
+    const QVector3D& first = mesh.vertices.front();
+    const QVector3D& last = mesh.vertices.back();
+    hash ^= std::hash<float>{}(first.x()) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    hash ^= std::hash<float>{}(first.y()) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    hash ^= std::hash<float>{}(first.z()) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    hash ^= std::hash<float>{}(last.x()) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    hash ^= std::hash<float>{}(last.y()) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    hash ^= std::hash<float>{}(last.z()) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+  }
+  if (!mesh.triangles.empty()) {
+    const auto& first = mesh.triangles.front();
+    const auto& last = mesh.triangles.back();
+    hash ^= static_cast<std::size_t>(first[0] + first[1] + first[2]);
+    hash ^= static_cast<std::size_t>(last[0] + last[1] + last[2]) << 8;
+  }
+  return hash;
+}
+
+bool MeshesEqual(const display::ObjMesh& a, const display::ObjMesh& b) {
+  if (a.vertices.size() != b.vertices.size() ||
+      a.triangles.size() != b.triangles.size()) {
+    return false;
+  }
+  for (std::size_t i = 0; i < a.vertices.size(); ++i) {
+    if (a.vertices[i] != b.vertices[i]) {
+      return false;
+    }
+  }
+  for (std::size_t i = 0; i < a.triangles.size(); ++i) {
+    if (a.triangles[i] != b.triangles[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+}  // namespace
+
+void OgreMeshLoader::ensurePrimitiveMeshes() { ensureAvizPrimitiveMeshes(); }
+
+std::string OgreMeshLoader::primitiveMeshName(const display::ObjMesh& mesh) {
+  ensurePrimitiveMeshes();
+  static const display::ObjMesh kCube = display::buildCubeMesh();
+  static const display::ObjMesh kSphere = display::buildSphereMesh(0.5f);
+  static const display::ObjMesh kCylinder = display::buildCylinderMesh(0.5f, 1.f);
+  static const display::ObjMesh kCone = display::buildConeMesh(0.5f, 1.f);
+  if (MeshesEqual(mesh, kCube)) {
+    return "aviz_cube.mesh";
+  }
+  if (MeshesEqual(mesh, kSphere)) {
+    return "aviz_sphere.mesh";
+  }
+  if (MeshesEqual(mesh, kCylinder)) {
+    return "aviz_cylinder.mesh";
+  }
+  if (MeshesEqual(mesh, kCone)) {
+    return "aviz_cone.mesh";
+  }
+  return {};
+}
+
+std::string OgreMeshLoader::registerCachedObjMesh(const display::ObjMesh& mesh) {
+  if (mesh.vertices.empty() || mesh.triangles.empty()) {
+    return {};
+  }
+  // Stable CPU caches (Robot visual_meshes_, Marker stored mesh) keep the same
+  // address across frames — skip rehashing large OBJs every draw.
+  static std::unordered_map<const display::ObjMesh*, std::string> by_address;
+  const auto cached = by_address.find(&mesh);
+  if (cached != by_address.end()) {
+    return cached->second;
+  }
+  const std::string primitive = primitiveMeshName(mesh);
+  if (!primitive.empty()) {
+    by_address[&mesh] = primitive;
+    return primitive;
+  }
+  const std::string name =
+      "AvizMesh/" + std::to_string(HashMesh(mesh)) + ".mesh";
+  registerObjMesh(name, mesh);
+  by_address[&mesh] = name;
+  return name;
+}
+
+std::string OgreMeshLoader::loadAndRegisterMeshFile(const std::string& path) {
+  display::ObjMesh mesh;
+  if (!display::loadMeshFile(path, &mesh)) {
+    return {};
+  }
+  return registerCachedObjMesh(mesh);
+}
+
+Ogre::MeshPtr OgreMeshLoader::loadMeshFromResource(
+    const std::string& resource_uri) {
+  if (Ogre::MeshManager::getSingleton().resourceExists(resource_uri, kMeshGroup)) {
+    return Ogre::MeshManager::getSingleton().getByName(resource_uri, kMeshGroup);
+  }
+
+  const QFileInfo model_path(QString::fromStdString(resource_uri));
+  const std::string ext = model_path.completeSuffix().toLower().toStdString();
+  if (ext == "mesh") {
+    const auto resource = MeshResourceResolver::instance().fetch(resource_uri);
+    if (resource == nullptr || resource->data.empty()) {
+      return {};
+    }
+    Ogre::MeshSerializer serializer;
+    Ogre::DataStreamPtr stream(new Ogre::MemoryDataStream(
+        resource->data.data(), resource->data.size()));
+    Ogre::MeshPtr mesh =
+        Ogre::MeshManager::getSingleton().createManual(resource_uri, kMeshGroup);
+    serializer.importMesh(stream, mesh.get());
+    stream->close();
+    return mesh;
+  }
+
+#ifdef AUTOVIZ_USE_ASSIMP
+  AssimpLoader loader(&MeshResourceResolver::instance());
+  if (!MeshResourceResolver::instance().exists(resource_uri)) {
+    throw MeshResourceError("Could not resolve resource URI: " + resource_uri);
+  }
+  const aiScene* scene = loader.getScene(resource_uri);
+  if (scene == nullptr) {
+    LOG(ERROR) << "Could not load resource [" << resource_uri
+               << "]: " << loader.getErrorMessage();
+    return {};
+  }
+  return loader.meshFromAssimpScene(resource_uri, scene);
+#else
+  if (ext == "stl" || ext == "obj") {
+    const auto path = MeshResourceResolver::instance().resolvePath(resource_uri);
+    if (!path.has_value()) {
+      throw MeshResourceError("Could not resolve resource URI: " + resource_uri);
+    }
+    const std::string registered = loadAndRegisterMeshFile(*path);
+    if (registered.empty()) {
+      throw MeshResourceError("Could not load resource: " + resource_uri);
+    }
+    return Ogre::MeshManager::getSingleton().getByName(registered, kMeshGroup);
+  }
+  LOG(ERROR) << "Assimp disabled; cannot load mesh resource: " << resource_uri;
+  return {};
+#endif
+}
+
+}  // namespace rendering
+}  // namespace autoviz
+
